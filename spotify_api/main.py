@@ -1,5 +1,5 @@
 """
-A simmple CLI for getting your most recent songs images from spotify via the API.
+A simple CLI for getting your most recent songs images from spotify via the API.
 
 TO-DO:
     - allow users to use an album instead of the liked songs
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # region argsparse
 
     parser = argparse.ArgumentParser(
-        description="A simmple CLI for getting your most recent songs images via the spotify API.",
+        description="A simple CLI for getting your most recent songs images via the spotify API.",
         usage="<path> [options]",
     )
 

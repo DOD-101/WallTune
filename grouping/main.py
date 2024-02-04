@@ -4,7 +4,7 @@ apropriate folders.
 
 TO-DO:
     -give the options to: overwrite files, do not create directories,
-        create all directories regarless of content
+        create all directories regardless of content
     -deal with edge cases such as .. and ~
 """
 
@@ -37,7 +37,7 @@ def calculate_delta_e(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) ->
     return delta_e
 
 
-def _mainlogic(file, options_dict, threashold, fallback_path, copy):
+def _mainlogic(file, options_dict, threshold, fallback_path, copy):
     average_c = average(file, 1, False)[0]
     deltas = {
         key: calculate_delta_e(options_dict[key], average_c)
@@ -45,7 +45,7 @@ def _mainlogic(file, options_dict, threashold, fallback_path, copy):
     }
 
     lowest_delta_key = min(deltas, key=deltas.get)
-    if deltas[lowest_delta_key] > threashold:
+    if deltas[lowest_delta_key] > threshold:
         save_path = fallback_path
     else:
         save_path = lowest_delta_key
@@ -62,14 +62,14 @@ def main(
     files,
     json_path: str,
     fallback_path: str = None,
-    threashold: float = 1000,  # max value is 100 an delta e scale
+    threshold: float = 1000,  # max value is 100 an delta e scale
     **kwargs
 ):
     """
     Main function for executing the appropriate functions given the parameters.
     """
     copy = kwargs.get("copy", False)
-    recursive = kwargs.get("recurssive", True)
+    recursive = kwargs.get("recursive", True)
 
     with open(json_path, "r", encoding="utf-8") as file:
         options_dict = json.load(file)
@@ -78,7 +78,7 @@ def main(
     if ext == "" and recursive:
         for file in listdir(files):
             file = join(files, file)
-            _mainlogic(file, options_dict, threashold, fallback_path, copy)
+            _mainlogic(file, options_dict, threshold, fallback_path, copy)
     elif ext == "":
         print(
             Fore.RED
@@ -87,7 +87,7 @@ def main(
             + "To iterate over a directory set the -r flag."
         )
     elif ext != "":
-        _mainlogic(files, options_dict, threashold, fallback_path, copy)
+        _mainlogic(files, options_dict, threshold, fallback_path, copy)
 
 
 rgb_target = (230, 50, 50)  # Example RGB color
@@ -98,6 +98,7 @@ rgb_options_dict = {
 # print(main(rgb_target, rgb_options_dict))
 
 if __name__ == "__main__":
+
     # regions argparse
 
     parser = argparse.ArgumentParser(
@@ -115,11 +116,11 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "-t",
-        "--threashold",
+        "--threshold",
         metavar="",
         default=1000,
         type=float,
-        help="The Delta-E threashold. Should be a value between 1-100. Default: None",
+        help="The Delta-E threshold. Should be a value between 1-100. Default: None",
     )
 
     parser.add_argument(
@@ -127,7 +128,7 @@ if __name__ == "__main__":
         "--fallback",
         type=str,
         metavar="",
-        help="Where to store files that over the Delta-E threashold ",
+        help="Where to store files that over the Delta-E threshold ",
     )
 
     parser.add_argument(
@@ -152,7 +153,7 @@ if __name__ == "__main__":
         args.path,
         args.json_path,
         args.fallback,
-        args.threashold,
-        recurssive=args.r,
+        args.threshold,
+        recursive=args.r,
         copy=args.copy,
     )

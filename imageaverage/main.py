@@ -103,7 +103,7 @@ def main(files, mod: int, recursive: bool = False, no_warnings: bool = False):
 
 if __name__ == "__main__":
 
-    # region argsparse
+    # region argparse
 
     parser = argparse.ArgumentParser(
         description="Takes in a file / directory and get the average color of each file.",

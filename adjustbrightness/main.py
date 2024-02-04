@@ -34,7 +34,7 @@ def meetcondition(value: float, condition: float, is_max: bool = False) -> bool:
 
 def _mainlogic(file, condition, is_max, mod, output):
     """
-    Internal logic of the main function. Responisble for checking brightness and applying modifier.
+    Internal logic of the main function. Responsible for checking brightness and applying modifier.
     """
     # Check if the file ends with .jpg or .png
     if splitext(file)[1] in [".jpg", ".png"]:
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # region argparse
 
     parser = argparse.ArgumentParser(
-        description="Takes in a file / directory and ajusts the brightness conditionally.",
+        description="Takes in a file / directory and adjusts the brightness conditionally.",
         usage="<input path> <output path> [options]",
     )
 
