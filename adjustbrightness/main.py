@@ -1,5 +1,5 @@
 """
-A CLI to take in a file/files and ajust the brightness conditionally.
+A CLI to take in a file/files and adjust the brightness conditionally.
 """
 
 import argparse
@@ -15,58 +15,6 @@ path.append("..")
 from shared.brightness import (  # pylint: disable=wrong-import-position
     getbrightness,
 )
-
-# region argparse
-
-parser = argparse.ArgumentParser(
-    description="Takes in a file / directory and ajusts the brightness conditionally.",
-    usage="<input path> <output path> [options]",
-)
-
-parser.add_argument("path", metavar="path", type=str, help="Path to the input file(s).")
-
-parser.add_argument(
-    "destination",
-    metavar="destination",
-    type=str,
-    help="Path to the save location of the file(s).",
-)
-
-parser.add_argument(
-    "-m",
-    "--mod",
-    metavar="",
-    type=float,
-    default=1,
-    help="Value for modifying the brightness. Default: 1",
-)
-
-parser.add_argument(
-    "-c",
-    "--condition",
-    type=float,
-    metavar="",
-    default=255,
-    help="Mean brightness of image needed to convert it using the modifier. Default: None",
-)
-
-parser.add_argument(
-    "-r",
-    action="store_true",
-    help="Recursive operation. Applies the command to directories and their contents recursively.",
-)
-
-parser.add_argument(
-    "-x",
-    "--max",
-    action="store_true",
-    default=False,
-    help="Changes the condition from being the minimum to be being the maximum value.",
-)
-
-args = parser.parse_args()
-
-# endregion
 
 
 def adjustbrightness(img: Image.Image, mod: float) -> Image.Image:
@@ -127,6 +75,62 @@ def main(files, output, condition, mod, **kwargs):
 
 
 if __name__ == "__main__":
+
+    # region argparse
+
+    parser = argparse.ArgumentParser(
+        description="Takes in a file / directory and ajusts the brightness conditionally.",
+        usage="<input path> <output path> [options]",
+    )
+
+    parser.add_argument(
+        "path", metavar="path", type=str, help="Path to the input file(s)."
+    )
+
+    parser.add_argument(
+        "destination",
+        metavar="destination",
+        type=str,
+        help="Path to the save location of the file(s).",
+    )
+
+    parser.add_argument(
+        "-m",
+        "--mod",
+        metavar="",
+        type=float,
+        default=1,
+        help="Value for modifying the brightness. Default: 1",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--condition",
+        type=float,
+        metavar="",
+        default=255,
+        help="Mean brightness of image needed to convert it using the modifier. Default: None",
+    )
+
+    parser.add_argument(
+        "-r",
+        action="store_true",
+        help="Recursive operation. Applies the command to directories \
+            and their contents recursively.",
+    )
+
+    parser.add_argument(
+        "-x",
+        "--max",
+        action="store_true",
+        default=False,
+        help="Changes the condition from being the minimum to be being the maximum value.",
+    )
+
+    args = parser.parse_args()
+
+    # endregion
+
     main(
         args.path,
         args.destination,

@@ -10,6 +10,7 @@ TO-DO:
 
 import argparse
 import json
+from typing import Tuple
 from sys import path
 from os.path import splitext, join, basename
 from os import listdir, makedirs
@@ -19,52 +20,13 @@ from pyciede2000 import ciede2000
 
 path.append("..")
 
-from imageaverage.main import main as average
-
-parser = argparse.ArgumentParser(
-    description="Sorts images based on their lowest delta E value to given options.",
-    usage="<path> <json path> [options]",
-)
-
-parser.add_argument("path", metavar="path", help="The path to the file(s)")
-
-parser.add_argument(
-    "json_path",
-    metavar="json path",
-    help="Path to the Json containing the paths : color value",
-)
-
-parser.add_argument(
-    "-t",
-    "--threashold",
-    metavar="",
-    default=1000,
-    type=float,
-    help="The Delta-E threashold. Should be a value between 1-100. Default: None",
-)
-
-parser.add_argument(
-    "-f",
-    "--fallback",
-    type=str,
-    metavar="",
-    help="Where to store files that over the Delta-E threashold ",
-)
-
-parser.add_argument(
-    "-r",
-    action="store_true",
-    help="Recursive operation. Applies the command to directories and their contents recursively.",
-)
-
-parser.add_argument(
-    "-c", "--copy", action="store_true", help="Copies the files instead of moving them."
-)
-
-args = parser.parse_args()
+from imageaverage.main import main as average  # pylint: disable=wrong-import-position
 
 
-def calculate_delta_e(rgb1, rgb2):
+def calculate_delta_e(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) -> float:
+    """
+    First converts the rgb values to sRGB and then uses pyciede2000 to get Delta-E.
+    """
     # Convert RGB to sRGB
     srgb1 = [val / 255 for val in rgb1]
     srgb2 = [val / 255 for val in rgb2]
@@ -103,6 +65,9 @@ def main(
     threashold: float = 1000,  # max value is 100 an delta e scale
     **kwargs
 ):
+    """
+    Main function for executing the appropriate functions given the parameters.
+    """
     copy = kwargs.get("copy", False)
     recursive = kwargs.get("recurssive", True)
 
@@ -133,6 +98,56 @@ rgb_options_dict = {
 # print(main(rgb_target, rgb_options_dict))
 
 if __name__ == "__main__":
+    # regions argparse
+
+    parser = argparse.ArgumentParser(
+        description="Sorts images based on their lowest delta E value to given options.",
+        usage="<path> <json path> [options]",
+    )
+
+    parser.add_argument("path", metavar="path", help="The path to the file(s)")
+
+    parser.add_argument(
+        "json_path",
+        metavar="json path",
+        help="Path to the Json containing the paths : color value",
+    )
+
+    parser.add_argument(
+        "-t",
+        "--threashold",
+        metavar="",
+        default=1000,
+        type=float,
+        help="The Delta-E threashold. Should be a value between 1-100. Default: None",
+    )
+
+    parser.add_argument(
+        "-f",
+        "--fallback",
+        type=str,
+        metavar="",
+        help="Where to store files that over the Delta-E threashold ",
+    )
+
+    parser.add_argument(
+        "-r",
+        action="store_true",
+        help="Recursive operation. Applies the command to directories \
+            and their contents recursively.",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--copy",
+        action="store_true",
+        help="Copies the files instead of moving them.",
+    )
+
+    args = parser.parse_args()
+
+    # endregion
+
     main(
         args.path,
         args.json_path,

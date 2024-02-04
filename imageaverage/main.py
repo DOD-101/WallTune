@@ -102,6 +102,9 @@ def main(files, mod: int, recursive: bool = False, no_warnings: bool = False):
 
 
 if __name__ == "__main__":
+
+    # region argsparse
+
     parser = argparse.ArgumentParser(
         description="Takes in a file / directory and get the average color of each file.",
         usage="<path> [options]",
@@ -125,7 +128,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-r",
         action="store_true",
-        help="Recursive operation. Applies the command to directories and their contents recursively.",
+        help="Recursive operation. Applies the command to directories \
+            and their contents recursively.",
     )
 
     parser.add_argument(
@@ -133,6 +137,9 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    # endregion
+
     output = main(args.path, args.mod, args.r, args.no_warnings)
 
     for o in output:
