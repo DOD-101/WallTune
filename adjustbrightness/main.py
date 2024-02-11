@@ -13,9 +13,7 @@ path.append(abspath(join(dirname(__file__), "..")))
 
 # pylint: disable=wrong-import-position
 
-from shared.brightness import (
-    getbrightness,
-)
+from shared.brightness import getbrightness
 
 from shared import folders
 

@@ -9,7 +9,6 @@ import argparse
 from typing import Tuple
 from sys import path
 from sys import exit as sysexit
-from os import listdir
 from os.path import isdir, splitext, join, abspath, dirname
 
 from PIL import Image
