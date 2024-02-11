@@ -12,13 +12,13 @@ import argparse
 import json
 from typing import Tuple
 from sys import path
-from os.path import splitext, join, basename
+from os.path import splitext, join, basename, abspath, dirname
 from os import listdir, makedirs
 import shutil
 from colorama import Fore
 from pyciede2000 import ciede2000
 
-path.append("..")
+path.append(abspath(join(dirname(__file__), "..")))
 
 from imageaverage.main import main as average  # pylint: disable=wrong-import-position
 

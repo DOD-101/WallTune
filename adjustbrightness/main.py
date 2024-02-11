@@ -6,11 +6,11 @@ import argparse
 from sys import path
 from sys import exit as sysexit
 from os import listdir
-from os.path import isdir, splitext, join, basename
+from os.path import isdir, splitext, join, basename, abspath, dirname
 from PIL import Image, ImageEnhance
 from colorama import Fore
 
-path.append("..")
+path.append(abspath(join(dirname(__file__), "..")))
 
 from shared.brightness import (  # pylint: disable=wrong-import-position
     getbrightness,
@@ -109,7 +109,8 @@ if __name__ == "__main__":
         type=float,
         metavar="",
         default=255,
-        help="Mean brightness of image needed to convert it using the modifier. Default: None",
+        help="Mean brightness of image needed to convert it using the modifier. \
+        Should be a value between 0-255. Default: None",
     )
 
     parser.add_argument(
