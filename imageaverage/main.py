@@ -18,9 +18,15 @@ from colorama import Fore
 
 path.append(abspath(join(dirname(__file__), "..")))
 
-from shared.colorconversion import (  # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+
+from shared.colorconversion import (
     rgb_to_hex,
 )
+
+from shared import folders
+
+# pylint: enable=wrong-import-position
 
 RGB = "RGB"
 
@@ -77,8 +83,8 @@ def main(files, mod: int, recursive: bool = False, no_warnings: bool = False):
     """
     returnoutput = []
     if isdir(files) and recursive:
-        for file in listdir(files):
-            file = join(files, file)
+        filelist = folders.list_all_contents(files)
+        for file in filelist:
             # Check if the file ends with .jpg or .png
             if splitext(file)[1] in [".jpg", ".png"]:
                 colors = get_average_color(file)
