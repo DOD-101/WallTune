@@ -4,17 +4,22 @@ A CLI to take in a file/files and adjust the brightness conditionally.
 
 import argparse
 from sys import path
-from sys import exit as sysexit
-from os import listdir
-from os.path import isdir, splitext, join, basename, abspath, dirname
+from os import makedirs, remove
+from os.path import splitext, join, basename, abspath, dirname
 from PIL import Image, ImageEnhance
 from colorama import Fore
 
 path.append(abspath(join(dirname(__file__), "..")))
 
-from shared.brightness import (  # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+
+from shared.brightness import (
     getbrightness,
 )
+
+from shared import folders
+
+# pylint: enable=wrong-import-position
 
 
 def adjustbrightness(img: Image.Image, mod: float) -> Image.Image:
@@ -32,10 +37,13 @@ def meetcondition(value: float, condition: float, is_max: bool = False) -> bool:
     return meet
 
 
-def _mainlogic(file, condition, is_max, mod, output):
+def _mainlogic(file, condition, mod, output, **kwargs):
     """
     Internal logic of the main function. Responsible for checking brightness and applying modifier.
     """
+    is_max = kwargs.get("is_max", False)
+    move = kwargs.get("move", False)
+
     # Check if the file ends with .jpg or .png
     if splitext(file)[1] in [".jpg", ".png"]:
         img = Image.open(file)
@@ -44,10 +52,21 @@ def _mainlogic(file, condition, is_max, mod, output):
             img = adjustbrightness(img, mod)
         else:
             mod = 1
-        if isdir(output):
+
+        outpathtype = folders.check_path_type(output)
+
+        if outpathtype == folders.PathType.NEW_DIR:
+            makedirs(output)
+
+        if outpathtype in [folders.PathType.DIRECTORY, folders.PathType.NEW_DIR]:
             output = join(output, basename(file))
+
         img.save(output)
         print(f"Saved {output} having modified {file} by {mod}.")
+
+        if move:
+            remove(file)
+            print(f"Deleted {file}")
 
 
 def main(files, output, condition, mod, **kwargs):
@@ -56,22 +75,27 @@ def main(files, output, condition, mod, **kwargs):
     """
     recursive = kwargs.get("recursive", False)
     is_max = kwargs.get("is_max", False)
+    move = kwargs.get("move", False)
 
-    if isdir(files) and recursive:
-        for file in listdir(files):
-            file = join(files, file)
-            _mainlogic(file, condition, is_max, mod, output)
-    elif not isdir(files):
-        _mainlogic(files, condition, is_max, mod, output)
-    elif isdir(files) and not recursive:
+    inpathtype = folders.check_path_type(files)
+
+    if inpathtype == folders.PathType.DIRECTORY and recursive:
+        fileslist = folders.list_all_contents(files)
+        for file in fileslist:
+            _mainlogic(file, condition, mod, output, move=move, is_max=is_max)
+    elif inpathtype == folders.PathType.FILE:
+        _mainlogic(files, condition, mod, output, move=move, is_max=is_max)
+    elif inpathtype == folders.PathType.DIRECTORY and not recursive:
         print(
             Fore.RED
             + "Error: "
             + Fore.RESET
             + "To iterate over a directory set the -r flag."
         )
+    elif inpathtype in [folders.PathType.NEW_DIR, folders.PathType.NEW_FILE]:
+        print(Fore.RED + "Error: " + Fore.RESET + "Input cannot be empty.")
     else:
-        sysexit()
+        print(Fore.RED + "Error: " + Fore.RESET + f"An Error has ocurred. {files}")
 
 
 if __name__ == "__main__":
@@ -128,6 +152,10 @@ if __name__ == "__main__":
         help="Changes the condition from being the minimum to be being the maximum value.",
     )
 
+    parser.add_argument(
+        "--move", action="store_true", help="Moves the files instead of copying them."
+    )
+
     args = parser.parse_args()
 
     # endregion
@@ -139,4 +167,5 @@ if __name__ == "__main__":
         args.mod,
         recursive=args.r,
         is_max=args.max,
+        move=args.move,
     )

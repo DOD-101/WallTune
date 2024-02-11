@@ -12,15 +12,21 @@ import argparse
 import json
 from typing import Tuple
 from sys import path
-from os.path import splitext, join, basename, abspath, dirname
-from os import listdir, makedirs
+from os.path import join, basename, abspath, dirname
+from os import makedirs
 import shutil
 from colorama import Fore
 from pyciede2000 import ciede2000
 
 path.append(abspath(join(dirname(__file__), "..")))
 
-from imageaverage.main import main as average  # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+
+from imageaverage.main import main as average
+
+from shared import folders
+
+# pylint: enable=wrong-import-position
 
 
 def calculate_delta_e(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) -> float:
@@ -37,7 +43,7 @@ def calculate_delta_e(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) ->
     return delta_e
 
 
-def _mainlogic(file, options_dict, threshold, fallback_path, copy):
+def _mainlogic(file, options_dict, threshold, fallback_path, move):
     average_c = average(file, 1, False)[0]
     deltas = {
         key: calculate_delta_e(options_dict[key], average_c)
@@ -52,10 +58,10 @@ def _mainlogic(file, options_dict, threshold, fallback_path, copy):
 
     makedirs(save_path, exist_ok=True)
 
-    if copy:
-        shutil.copy(file, join(save_path, basename(file)))
-    else:
+    if move:
         shutil.move(file, join(save_path, basename(file)))
+    else:
+        shutil.copy(file, join(save_path, basename(file)))
 
 
 def main(
@@ -63,39 +69,36 @@ def main(
     json_path: str,
     fallback_path: str = None,
     threshold: float = 1000,  # max value is 100 an delta e scale
-    **kwargs
+    **kwargs,
 ):
     """
     Main function for executing the appropriate functions given the parameters.
     """
-    copy = kwargs.get("copy", False)
+    move = kwargs.get("move", False)
     recursive = kwargs.get("recursive", True)
 
     with open(json_path, "r", encoding="utf-8") as file:
         options_dict = json.load(file)
 
-    _, ext = splitext(files)
-    if ext == "" and recursive:
-        for file in listdir(files):
-            file = join(files, file)
-            _mainlogic(file, options_dict, threshold, fallback_path, copy)
-    elif ext == "":
+    inpathtype = folders.check_path_type(files)
+    if inpathtype == folders.PathType.DIRECTORY and recursive:
+        filelist = folders.list_all_contents(files)
+        for file in filelist:
+            _mainlogic(file, options_dict, threshold, fallback_path, move)
+    elif inpathtype == folders.PathType.DIRECTORY:
         print(
             Fore.RED
             + "Error: "
             + Fore.RESET
             + "To iterate over a directory set the -r flag."
         )
-    elif ext != "":
-        _mainlogic(files, options_dict, threshold, fallback_path, copy)
+    elif inpathtype == folders.PathType.FILE:
+        _mainlogic(files, options_dict, threshold, fallback_path, move)
+    elif inpathtype in [folders.PathType.NEW_DIR, folders.PathType.NEW_FILE]:
+        print(Fore.RED + "Error: " + Fore.RESET + "Input cannot be empty.")
+    else:
+        print(Fore.RED + "Error: " + Fore.RESET + f"An Error has ocurred. {files}")
 
-
-rgb_target = (230, 50, 50)  # Example RGB color
-rgb_options_dict = {
-    "dark": [0, 0, 0],
-    "light": [255, 255, 255],
-}
-# print(main(rgb_target, rgb_options_dict))
 
 if __name__ == "__main__":
 
@@ -139,10 +142,9 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-c",
-        "--copy",
+        "--move",
         action="store_true",
-        help="Copies the files instead of moving them.",
+        help="Moves the files instead of moving them.",
     )
 
     args = parser.parse_args()
@@ -155,5 +157,5 @@ if __name__ == "__main__":
         args.fallback,
         args.threshold,
         recursive=args.r,
-        copy=args.copy,
+        move=args.move,
     )
