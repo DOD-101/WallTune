@@ -6,7 +6,7 @@ TO-DO:
 """
 
 import argparse
-from os import getcwd
+from os import getcwd, makedirs
 from os.path import join
 from urllib.request import urlretrieve
 from urllib.parse import quote
@@ -31,9 +31,11 @@ def sanitize_filename(filename):
     return safe_filename
 
 
-def main(path: str, amount: int, offset: int):
+def main(save_path: str, amount: int, offset: int):
     """Main function to get and save the images."""
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=SCOPE))
+
+    makedirs(save_path, exist_ok=True)
 
     total_fetched = 0
     while total_fetched < amount:
@@ -48,7 +50,7 @@ def main(path: str, amount: int, offset: int):
             print(idx, track["artists"][0]["name"], " - ", track["name"])
             urlretrieve(
                 track["album"]["images"][0]["url"],
-                join(path, f"{safe_track_name}_albumCover.jpg"),
+                join(save_path, f"{safe_track_name}_albumCover.jpg"),
             )
 
     print("Total fetched:", total_fetched)
