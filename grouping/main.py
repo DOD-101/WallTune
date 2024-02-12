@@ -131,7 +131,7 @@ if __name__ == "__main__":
         "--fallback",
         type=str,
         metavar="",
-        help="Where to store files that over the Delta-E threshold ",
+        help="Where to store files that are over the Delta-E threshold ",
     )
 
     parser.add_argument(
