@@ -74,7 +74,7 @@ def _mainlogic(
             Fore.RED
             + "Error: "
             + Fore.RESET
-            + f"Directory {save_path} doesn't exist and -d / --create-no-dirs is set."
+            + f"Directory {save_path} doesn't exist and -n / --create-no-dirs is set."
         )
         sysexit(1)
 
@@ -206,6 +206,7 @@ if __name__ == "__main__":
         help="Creates all directories in the json file (+ fallback) regardless \
               of whether, they are actually ever used.",
     )
+
     parser.add_argument(
         "--create-no-dirs",
         "-n",

@@ -6,6 +6,7 @@ TO-DO:
 """
 
 import argparse
+from sys import exit as sysexit
 from os import getcwd, makedirs
 from os.path import join
 from urllib.request import urlretrieve
@@ -15,6 +16,7 @@ from re import sub
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
+from colorama import Fore
 
 load_dotenv()
 
@@ -31,11 +33,13 @@ def sanitize_filename(filename):
     return safe_filename
 
 
-def main(save_path: str, amount: int, offset: int):
+def main(save_path: str, amount: int, offset: int, create_no_dirs: bool):
     """Main function to get and save the images."""
+
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=SCOPE))
 
-    makedirs(save_path, exist_ok=True)
+    if not create_no_dirs:
+        makedirs(save_path, exist_ok=True)
 
     total_fetched = 0
     while total_fetched < amount:
@@ -48,10 +52,22 @@ def main(save_path: str, amount: int, offset: int):
             track = item["track"]
             safe_track_name = sanitize_filename(track["name"])
             print(idx, track["artists"][0]["name"], " - ", track["name"])
-            urlretrieve(
-                track["album"]["images"][0]["url"],
-                join(save_path, f"{safe_track_name}_albumCover.jpg"),
-            )
+            try:
+                urlretrieve(
+                    track["album"]["images"][0]["url"],
+                    join(save_path, f"{safe_track_name}_albumCover.jpg"),
+                )
+            except Exception as e:
+                if create_no_dirs and isinstance(e, FileNotFoundError):
+                    print(
+                        Fore.RED
+                        + "Error: "
+                        + Fore.RESET
+                        + f"Directory {save_path} doesn't exist and -d / --create-no-dirs is set."
+                    )
+                    sysexit(1)
+
+                raise e
 
     print("Total fetched:", total_fetched)
 
@@ -91,8 +107,20 @@ if __name__ == "__main__":
         help="The offset of your most recent liked songs to start from.",
     )
 
+    parser.add_argument(
+        "--create-no-dirs",
+        "-n",
+        action="store_true",
+        help="The opposite of -d. Disallows the creation of any directories.",
+    )
+
     args = parser.parse_args()
 
     # endregion
 
-    main(args.path, args.amount, args.offset)
+    main(
+        args.path,
+        args.amount,
+        args.offset,
+        args.create_no_dirs,
+    )

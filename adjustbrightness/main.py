@@ -4,6 +4,7 @@ A CLI to take in a file/files and adjust the brightness conditionally.
 
 import argparse
 from sys import path
+from sys import exit as sysexit
 from os import makedirs, remove
 from os.path import splitext, join, basename, abspath, dirname
 from PIL import Image, ImageEnhance
@@ -41,6 +42,7 @@ def _mainlogic(file, condition, mod, output, **kwargs):
     """
     is_max = kwargs.get("is_max", False)
     move = kwargs.get("move", False)
+    create_no_dirs = kwargs.get("create_no_dirs", False)
 
     # Check if the file ends with .jpg or .png
     if splitext(file)[1] in [".jpg", ".png"]:
@@ -52,6 +54,18 @@ def _mainlogic(file, condition, mod, output, **kwargs):
             mod = 1
 
         outpathtype = folders.check_path_type(output)
+
+        if (
+            outpathtype in [folders.PathType.NEW_FILE, folders.PathType.NEW_DIR]
+            and create_no_dirs
+        ):
+            print(
+                Fore.RED
+                + "Error: "
+                + Fore.RESET
+                + f"Directory {output} doesn't exist and -n / --create-no-dirs is set."
+            )
+            sysexit(1)
 
         if outpathtype == folders.PathType.NEW_DIR:
             makedirs(output)
@@ -74,15 +88,32 @@ def main(files, output, condition, mod, **kwargs):
     recursive = kwargs.get("recursive", False)
     is_max = kwargs.get("is_max", False)
     move = kwargs.get("move", False)
+    create_no_dirs = kwargs.get("create_no_dirs", False)
 
     inpathtype = folders.check_path_type(files)
 
     if inpathtype == folders.PathType.DIRECTORY and recursive:
         fileslist = folders.list_all_contents(files)
         for file in fileslist:
-            _mainlogic(file, condition, mod, output, move=move, is_max=is_max)
+            _mainlogic(
+                file,
+                condition,
+                mod,
+                output,
+                move=move,
+                is_max=is_max,
+                create_no_dirs=create_no_dirs,
+            )
     elif inpathtype == folders.PathType.FILE:
-        _mainlogic(files, condition, mod, output, move=move, is_max=is_max)
+        _mainlogic(
+            files,
+            condition,
+            mod,
+            output,
+            move=move,
+            is_max=is_max,
+            create_no_dirs=create_no_dirs,
+        )
     elif inpathtype == folders.PathType.DIRECTORY and not recursive:
         print(
             Fore.RED
@@ -154,6 +185,12 @@ if __name__ == "__main__":
         "--move", action="store_true", help="Moves the files instead of copying them."
     )
 
+    parser.add_argument(
+        "--create-no-dirs",
+        "-n",
+        action="store_true",
+        help="The opposite of -d. Disallows the creation of any directories.",
+    )
     args = parser.parse_args()
 
     # endregion
@@ -166,4 +203,5 @@ if __name__ == "__main__":
         recursive=args.r,
         is_max=args.max,
         move=args.move,
+        create_no_dirs=args.create_no_dirs,
     )
