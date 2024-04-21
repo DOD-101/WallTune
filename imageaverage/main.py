@@ -45,10 +45,10 @@ def get_average_color(image_path: str) -> Tuple[int, int, int]:
 
 
 def modify(
-    colors: Tuple[int, int, int], mod: float, no_warnings: bool = True
+    color: Tuple[int, int, int], mod: float, no_warnings: bool = True
 ) -> Tuple[int, int, int]:
     """
-    Takes in an rgb value tuple and darkens every color be the modifier.
+    Takes in an rgb value tuple and darkens every color by the modifier.
     """
 
     g = 0
@@ -58,7 +58,7 @@ def modify(
         print(Fore.RED + "Error: " + Fore.RESET + "mod cannot be less than 1.")
         sysexit(1)
 
-    for i in colors:
+    for i in color:
         i = i * mod
         if i > 255:
             i = 255

@@ -3,7 +3,6 @@ A CLI to group images into categories based on their average color and moves the
 apropriate folders.
 
 TO-DO:
-    -give the options to: overwrite files, do not create directories,
     -deal with edge cases such as .. and ~
 """
 
