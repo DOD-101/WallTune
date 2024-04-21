@@ -1,8 +1,5 @@
 """
 Takes in a file / directory and get the average color of each file.
-
-TO-DO:
-    - Give user the option to modify the output color more than just brightness
 """
 
 import argparse
@@ -44,39 +41,50 @@ def get_average_color(image_path: str) -> Tuple[int, int, int]:
     return rounded_avg_color
 
 
-def modify(
-    color: Tuple[int, int, int], mod: float, no_warnings: bool = True
-) -> Tuple[int, int, int]:
+def _modify_inner(value: int, mod: int, color: str, no_warnings: bool) -> int:
     """
-    Takes in an rgb value tuple and darkens every color by the modifier.
+    Internal logic of the modify function. For changeing an RGB channel.
     """
+    return_value = value * mod
 
-    g = 0
-    return_colors = []
-
-    if 0 > mod:
-        print(Fore.RED + "Error: " + Fore.RESET + "mod cannot be less than 1.")
-        sysexit(1)
-
-    for i in color:
-        i = i * mod
-        if i > 255:
-            i = 255
+    if return_value > 255:
+        if return_value > 255:
+            return_value = 255
             if not no_warnings:
                 print(
                     Fore.YELLOW
                     + "Warning: "
                     + Fore.RESET
-                    + f"{RGB[g]} value was capped at 255."
+                    + f"{color} value was capped at 255."
                 )
-        g += 1
 
-        return_colors.append(round(i))
+    return return_value
+
+
+def modify(
+    color: Tuple[int, int, int], mod: float, no_warnings: bool, **kwargs
+) -> Tuple[int, int, int]:
+    """
+    Takes in an rgb value tuple and darkens every color by the modifier.
+    """
+    red = kwargs.get("red", mod)
+    green = kwargs.get("green", mod)
+    blue = kwargs.get("blue", mod)
+
+    return_colors = []
+
+    if 0 > mod:
+        print(Fore.RED + "Error: " + Fore.RESET + "mod cannot be less than 0.")
+        sysexit(1)
+
+    return_colors.append(_modify_inner(color[0], red, "red", no_warnings))
+    return_colors.append(_modify_inner(color[1], green, "green", no_warnings))
+    return_colors.append(_modify_inner(color[2], blue, "blue", no_warnings))
 
     return tuple(return_colors)
 
 
-def main(files, mod: int, recursive: bool = False, no_warnings: bool = False):
+def main(files, mod: int, recursive: bool = False, no_warnings: bool = False, **kwargs):
     """
     Main function for executing the appropriate functions given the parameters.
     """
@@ -87,11 +95,11 @@ def main(files, mod: int, recursive: bool = False, no_warnings: bool = False):
             # Check if the file ends with .jpg or .png
             if splitext(file)[1] in [".jpg", ".png"]:
                 colors = get_average_color(file)
-                colors = modify(colors, mod, no_warnings)
+                colors = modify(colors, mod, no_warnings, **kwargs)
                 returnoutput.append(colors)
     elif not isdir(files):
         colors = get_average_color(files)
-        colors = modify(colors, mod)
+        colors = modify(colors, mod, no_warnings, **kwargs)
         returnoutput.append(colors)
     elif isdir(files) and not recursive:
         print(
@@ -123,7 +131,29 @@ if __name__ == "__main__":
         metavar="",
         type=float,
         default=1,
-        help="Value for modifying the RGB values. (Changes brightness) Default: 1",
+        help="Value for modifying the RGB values. The individual color flags overwrite this. \
+              (Changes brightness) Default: 1",
+    )
+
+    parser.add_argument(
+        "--red",
+        metavar="",
+        type=float,
+        help="Value for modifying the red value.",
+    )
+
+    parser.add_argument(
+        "--green",
+        metavar="",
+        type=float,
+        help="Value for modifying the green value.",
+    )
+
+    parser.add_argument(
+        "--blue",
+        metavar="",
+        type=float,
+        help="Value for modifying the blue value.",
     )
 
     parser.add_argument(
@@ -143,9 +173,26 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    if args.red is None:
+        args.red = args.mod
+
+    if args.green is None:
+        args.green = args.mod
+
+    if args.blue is None:
+        args.blue = args.mod
+
     # endregion
 
-    output = main(args.path, args.mod, args.r, args.no_warnings)
+    output = main(
+        args.path,
+        args.mod,
+        args.r,
+        args.no_warnings,
+        red=args.red,
+        green=args.green,
+        blue=args.blue,
+    )
 
     for o in output:
         if args.hex:
