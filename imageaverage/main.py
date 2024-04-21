@@ -55,8 +55,8 @@ def modify(
     return_colors = []
 
     if 0 > mod:
-        print(Fore.RED + "ERROR: " + Fore.RESET + "mod cannot be less than 1.")
-        sysexit()
+        print(Fore.RED + "Error: " + Fore.RESET + "mod cannot be less than 1.")
+        sysexit(1)
 
     for i in colors:
         i = i * mod
@@ -101,7 +101,7 @@ def main(files, mod: int, recursive: bool = False, no_warnings: bool = False):
             + "To iterate over a directory set the -r flag."
         )
     else:
-        sysexit()
+        sysexit(1)
 
     return returnoutput
 

@@ -4,7 +4,6 @@ apropriate folders.
 
 TO-DO:
     -give the options to: overwrite files, do not create directories,
-        create all directories regardless of content
     -deal with edge cases such as .. and ~
 """
 
@@ -12,6 +11,7 @@ import argparse
 import json
 from typing import Tuple
 from sys import path
+from sys import exit as sysexit
 from os.path import join, basename, abspath, dirname
 from os import makedirs
 import shutil
@@ -43,7 +43,15 @@ def calculate_delta_e(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) ->
     return delta_e
 
 
-def _mainlogic(file, options_dict, threshold, fallback_path, move):
+def _mainlogic(
+    file,
+    options_dict,
+    threshold,
+    fallback_path,
+    **kwargs,
+):
+    create_no_dirs = kwargs.get("create_no_dirs", False)
+    move = kwargs.get("move", False)
     average_c = average(file, 1, False)[0]
     deltas = {
         key: calculate_delta_e(options_dict[key], average_c)
@@ -56,7 +64,20 @@ def _mainlogic(file, options_dict, threshold, fallback_path, move):
     else:
         save_path = lowest_delta_key
 
-    makedirs(save_path, exist_ok=True)
+    if not create_no_dirs:
+        makedirs(save_path, exist_ok=True)
+
+    if (
+        create_no_dirs
+        and folders.check_path_type(save_path) == folders.PathType.NEW_DIR
+    ):
+        print(
+            Fore.RED
+            + "Error: "
+            + Fore.RESET
+            + f"Directory {save_path} doesn't exist and -d / --create-no-dirs is set."
+        )
+        sysexit(1)
 
     if move:
         shutil.move(file, join(save_path, basename(file)))
@@ -77,13 +98,23 @@ def main(
     move = kwargs.get("move", False)
     recursive = kwargs.get("recursive", True)
     create_all_dirs = kwargs.get("create_all_dirs", False)
+    create_no_dirs = kwargs.get("create_no_dirs", False)
 
     with open(json_path, "r", encoding="utf-8") as file:
         options_dict = json.load(file)
 
+    if create_all_dirs and create_no_dirs:
+        print(
+            Fore.RED
+            + "Error: "
+            + Fore.RESET
+            + "Cannot set both -d / --create-all-dirs and -n / --create-no-dirs."
+        )
+        sysexit(1)
+
     if create_all_dirs:
-        for path in options_dict.keys():
-            makedirs(path, exist_ok=True)
+        for out_path in options_dict.keys():
+            makedirs(out_path, exist_ok=True)
 
         if fallback_path:
             makedirs(fallback_path, exist_ok=True)
@@ -92,7 +123,14 @@ def main(
     if inpathtype == folders.PathType.DIRECTORY and recursive:
         filelist = folders.list_all_contents(files)
         for file in filelist:
-            _mainlogic(file, options_dict, threshold, fallback_path, move)
+            _mainlogic(
+                file,
+                options_dict,
+                threshold,
+                fallback_path,
+                move=move,
+                create_no_dirs=create_no_dirs,
+            )
     elif inpathtype == folders.PathType.DIRECTORY:
         print(
             Fore.RED
@@ -101,7 +139,14 @@ def main(
             + "To iterate over a directory set the -r flag."
         )
     elif inpathtype == folders.PathType.FILE:
-        _mainlogic(files, options_dict, threshold, fallback_path, move)
+        _mainlogic(
+            files,
+            options_dict,
+            threshold,
+            fallback_path,
+            move=move,
+            create_no_dirs=create_no_dirs,
+        )
     elif inpathtype in [folders.PathType.NEW_DIR, folders.PathType.NEW_FILE]:
         print(Fore.RED + "Error: " + Fore.RESET + "Input cannot be empty.")
     else:
@@ -160,7 +205,13 @@ if __name__ == "__main__":
         "-d",
         action="store_true",
         help="Creates all directories in the json file (+ fallback) regardless \
-              of whether, they are actually ever used."
+              of whether, they are actually ever used.",
+    )
+    parser.add_argument(
+        "--create-no-dirs",
+        "-n",
+        action="store_true",
+        help="The opposite of -d. Disallows the creation of any directories.",
     )
 
     args = parser.parse_args()
@@ -175,4 +226,5 @@ if __name__ == "__main__":
         recursive=args.r,
         move=args.move,
         create_all_dirs=args.create_all_dirs,
+        create_no_dirs=args.create_no_dirs,
     )
