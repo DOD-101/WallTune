@@ -1,5 +1,5 @@
 """
-A CLI to group images into either a light or dark category and moves them into the
+A CLI to group images into categories based on their average color and moves them into the
 apropriate folders.
 
 TO-DO:
@@ -76,9 +76,17 @@ def main(
     """
     move = kwargs.get("move", False)
     recursive = kwargs.get("recursive", True)
+    create_all_dirs = kwargs.get("create_all_dirs", False)
 
     with open(json_path, "r", encoding="utf-8") as file:
         options_dict = json.load(file)
+
+    if create_all_dirs:
+        for path in options_dict.keys():
+            makedirs(path, exist_ok=True)
+
+        if fallback_path:
+            makedirs(fallback_path, exist_ok=True)
 
     inpathtype = folders.check_path_type(files)
     if inpathtype == folders.PathType.DIRECTORY and recursive:
@@ -102,7 +110,7 @@ def main(
 
 if __name__ == "__main__":
 
-    # regions argparse
+    # region argparse
 
     parser = argparse.ArgumentParser(
         description="Sorts images based on their lowest delta E value to given options.",
@@ -144,7 +152,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--move",
         action="store_true",
-        help="Moves the files instead of moving them.",
+        help="Moves the files instead of copying them.",
+    )
+
+    parser.add_argument(
+        "--create-all-dirs",
+        "-d",
+        action="store_true",
+        help="Creates all directories in the json file (+ fallback) regardless \
+              of whether, they are actually ever used."
     )
 
     args = parser.parse_args()
@@ -158,4 +174,5 @@ if __name__ == "__main__":
         args.threshold,
         recursive=args.r,
         move=args.move,
+        create_all_dirs=args.create_all_dirs,
     )

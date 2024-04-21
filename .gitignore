@@ -2,4 +2,5 @@ imgs
 .cache
 .env
 .vscode
+.venv
 __pycache__
