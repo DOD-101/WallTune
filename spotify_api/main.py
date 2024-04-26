@@ -63,7 +63,7 @@ def main(save_path: str, amount: int, offset: int, create_no_dirs: bool):
                         Fore.RED
                         + "Error: "
                         + Fore.RESET
-                        + f"Directory {save_path} doesn't exist and -d / --create-no-dirs is set."
+                        + f"Directory {save_path} doesn't exist and -n / --create-no-dirs is set."
                     )
                     sysexit(1)
 
