@@ -3,7 +3,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
 
-<sub>Version: 0.1.1.0</sub>
+<sub>Version: 0.1.2.0</sub>
 
 ## Features
 
@@ -28,8 +28,6 @@ SPOTIPY_REDIRECT_URI=<your_redirect>
 3. Run ```./spotify_api/main.py```
 
 ## To-Do
-- add the ability for the scripts to create directories (isdir() -> false if dir !exists)
-
 - write bash scripts
 
 ## Dependencies
