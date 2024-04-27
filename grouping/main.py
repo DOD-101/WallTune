@@ -200,16 +200,16 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--create-all-dirs",
         "-d",
+        "--create-all-dirs",
         action="store_true",
         help="Creates all directories in the json file (+ fallback) regardless \
               of whether, they are actually ever used.",
     )
 
     parser.add_argument(
-        "--create-no-dirs",
         "-n",
+        "--create-no-dirs",
         action="store_true",
         help="The opposite of -d. Disallows the creation of any directories.",
     )

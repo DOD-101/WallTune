@@ -186,8 +186,8 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--create-no-dirs",
         "-n",
+        "--create-no-dirs",
         action="store_true",
         help="The opposite of -d. Disallows the creation of any directories.",
     )
