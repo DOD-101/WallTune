@@ -36,7 +36,7 @@ def meetcondition(value: float, condition: float, is_max: bool = False) -> bool:
     return meet
 
 
-def _mainlogic(file, condition, mod, output, **kwargs):
+def _mainlogic(file: str, condition: float, mod: float, output: str, **kwargs):
     """
     Internal logic of the main function. Responsible for checking brightness and applying modifier.
     """
@@ -81,7 +81,7 @@ def _mainlogic(file, condition, mod, output, **kwargs):
             print(f"Deleted {file}")
 
 
-def main(files, output, condition, mod, **kwargs):
+def main(files: str, output: str, condition: float, mod: float, **kwargs):
     """
     Main function for executing the appropriate functions given the parameters.
     """

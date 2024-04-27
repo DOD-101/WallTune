@@ -43,10 +43,10 @@ def calculate_delta_e(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) ->
 
 
 def _mainlogic(
-    file,
-    options_dict,
-    threshold,
-    fallback_path,
+    file: str,
+    options_dict: dict,
+    threshold: float,
+    fallback_path: str,
     **kwargs,
 ):
     create_no_dirs = kwargs.get("create_no_dirs", False)
