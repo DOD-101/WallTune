@@ -1,8 +1,5 @@
 """
 A simple CLI for getting your most recent songs images from spotify via the API.
-
-TO-DO:
-    - allow users to use an album instead of the liked songs
 """
 
 import argparse
