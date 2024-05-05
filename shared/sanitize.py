@@ -1,5 +1,5 @@
 """
-Module for handeling the sanatizing of filenames.
+Module for handling the sanitizing of filenames.
 """
 
 from urllib.parse import quote

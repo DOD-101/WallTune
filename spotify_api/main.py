@@ -1,5 +1,5 @@
 """
-A simple CLI for getting your most recent songs images from spotify via the API.
+A simple CLI for getting your most recent songs images from Spotify via the API.
 """
 
 import argparse
@@ -18,7 +18,7 @@ path.append(abspath(join(dirname(__file__), "..")))
 
 # pylint: disable=wrong-import-position
 
-from shared.sanatize import sanitize_filename
+from shared.sanitize import sanitize_filename
 
 # pylint: enable=wrong-import-position
 
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     # region argsparse
 
     parser = argparse.ArgumentParser(
-        description="A simple CLI for getting your most recent songs images via the spotify API.",
+        description="A simple CLI for getting your most recent songs images via the Spotify API.",
         usage="<path> [options]",
     )
 

@@ -7,7 +7,7 @@
 
 ## Features
 
-- Gets your most recent spotify liked songs' Images
+- Gets your most recent Spotify liked songs' Images
 - Get the average color of an image to use as a fill color
 - Auto-Sort the images based on color
 
@@ -15,9 +15,9 @@
 
 ## Usage
 
-1. Create a spotify APP
+1. Create a Spotify APP
 
-2. Create a .env in spotify_api as such:
+2. Create a .env in Spotify_api as such:
 
 ```  shell
 SPOTIPY_CLIENT_ID=<your_client_id>

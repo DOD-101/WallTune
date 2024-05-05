@@ -1,5 +1,5 @@
 """
-A simple CLI for getting your most recent songs images via the spotify API.
+A simple CLI for getting your most recent songs images via the Spotify API.
 """
 
 import argparse
@@ -19,7 +19,7 @@ path.append(abspath(join(dirname(__file__), "..")))
 
 # pylint: disable=wrong-import-position
 
-from shared.sanatize import sanitize_filename
+from shared.sanitize import sanitize_filename
 
 # pylint: enable=wrong-import-position
 
@@ -32,7 +32,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=SCOPE))
 
 def main(save_path: str, interval: int, create_no_dirs: bool):
     """
-    The main function for getting the image of the currently playing song / expisode.
+    The main function for getting the image of the currently playing song / episode.
     """
     if not create_no_dirs:
         makedirs(save_path, exist_ok=True)
