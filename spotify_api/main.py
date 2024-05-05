@@ -3,17 +3,24 @@ A simple CLI for getting your most recent songs images from spotify via the API.
 """
 
 import argparse
+from sys import path
 from sys import exit as sysexit
 from os import makedirs
-from os.path import join
+from os.path import join, dirname, abspath
 from urllib.request import urlretrieve
-from urllib.parse import quote
-from re import sub
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 from colorama import Fore
+
+path.append(abspath(join(dirname(__file__), "..")))
+
+# pylint: disable=wrong-import-position
+
+from shared.sanatize import sanitize_filename
+
+# pylint: enable=wrong-import-position
 
 load_dotenv()
 
@@ -38,16 +45,6 @@ def get_playlist_id(client: spotipy.Spotify, playlist_name: str):
         offset += 50
     print(Fore.RED + "Error: " + Fore.RESET + "Couldn't find requested playlist.")
     sysexit(1)
-
-
-def sanitize_filename(filename: str):
-    """
-    Makes sure all files have valid names to be saved.
-    """
-    safe_filename = quote(filename.encode("utf-8"), safe=" ")
-    # Replace any character that is not alphanumeric, dash, underscore, or space with an underscore
-    safe_filename = sub(r"[^a-zA-Z0-9\-\s]", "_", safe_filename)
-    return safe_filename
 
 
 def main(
