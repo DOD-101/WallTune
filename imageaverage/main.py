@@ -24,8 +24,6 @@ from shared import folders
 
 # pylint: enable=wrong-import-position
 
-RGB = "RGB"
-
 
 def get_average_color(image_path: str) -> Tuple[int, int, int]:
     """
@@ -43,7 +41,7 @@ def get_average_color(image_path: str) -> Tuple[int, int, int]:
 
 def _modify_inner(value: int, mod: int, color: str, no_warnings: bool) -> int:
     """
-    Internal logic of the modify function. For changeing an RGB channel.
+    Internal logic of the modify function. For changing an RGB channel.
     """
     return_value = value * mod
 
@@ -77,14 +75,16 @@ def modify(
         print(Fore.RED + "Error: " + Fore.RESET + "mod cannot be less than 0.")
         sysexit(1)
 
-    return_colors.append(_modify_inner(color[0], red, "red", no_warnings))
-    return_colors.append(_modify_inner(color[1], green, "green", no_warnings))
-    return_colors.append(_modify_inner(color[2], blue, "blue", no_warnings))
+    return_colors.append(round(_modify_inner(color[0], red, "red", no_warnings)))
+    return_colors.append(round(_modify_inner(color[1], green, "green", no_warnings)))
+    return_colors.append(round(_modify_inner(color[2], blue, "blue", no_warnings)))
 
     return tuple(return_colors)
 
 
-def main(files, mod: int, recursive: bool = False, no_warnings: bool = False, **kwargs):
+def main(
+    files, mod: int, recursive: bool = False, no_warnings: bool = False, **kwargs
+) -> list:
     """
     Main function for executing the appropriate functions given the parameters.
     """
