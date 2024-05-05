@@ -83,8 +83,8 @@ def main(
                 track["album"]["images"][0]["url"],
                 join(save_path, f"{safe_track_name}_albumCover.jpg"),
             )
-        except Exception as e:
-            if create_no_dirs and isinstance(e, FileNotFoundError):
+        except FileNotFoundError as e:
+            if create_no_dirs:
                 print(
                     Fore.RED
                     + "Error: "
