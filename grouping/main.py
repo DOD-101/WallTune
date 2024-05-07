@@ -166,7 +166,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "json_path",
         metavar="json path",
-        help="Path to the Json containing the paths : color value",
+        help="Path to the json containing the paths : color value",
     )
 
     parser.add_argument(
