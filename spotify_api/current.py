@@ -1,5 +1,5 @@
 """
-A simple CLI for getting your most recent songs images via the Spotify API.
+A simple CLI for getting the image of the currently playing song / episode via the Spotify API. 
 """
 
 import argparse
