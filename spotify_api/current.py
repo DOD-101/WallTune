@@ -44,36 +44,30 @@ def main(save_path: str, interval: int, create_no_dirs: bool):
             + f"Directory {save_path} doesn't exist and -n / --create-no-dirs is set."
         )
         sysexit(1)
-    data = {}
-    while True:
-        last_data = data or {}
-        data = sp.currently_playing(additional_types="episode") or {}
-        if last_data.get("item", {}).get("id", None) == data.get("item", {}).get(
-            "id", None
-        ):
-            print("NO")
-            sleep(interval)
-            continue
 
-        if data.get("item", {}).get("type", None) == "track":
-            print("S ", data["item"]["name"])
-            urlretrieve(
-                data["item"]["album"]["images"][0]["url"],
-                join(
-                    save_path,
-                    f"{sanitize_filename(data["item"]["name"])}_albumCover_current.png",
-                ),
-            )
-        else:
-            print("P ", data["item"]["name"])
+    data = sp.currently_playing(additional_types="episode") or {}
 
-            urlretrieve(
-                data["item"]["images"][0]["url"],
-                join(
-                    save_path,
-                    f"{sanitize_filename(data["item"]["name"])}_podcastCover_current.png",
-                ),
-            )
+    if data.get("item", {}).get("type", None) == "track":
+        print("S ", data["item"]["name"])
+        urlretrieve(
+            data["item"]["album"]["images"][0]["url"],
+            join(
+                save_path,
+                f"{sanitize_filename(data["item"]["name"])}_albumCover_current.png",
+            ),
+        )
+    elif data.get("item", {}).get("type", None) == "episode":
+        print("P ", data["item"]["name"])
+
+        urlretrieve(
+            data["item"]["images"][0]["url"],
+            join(
+                save_path,
+                f"{sanitize_filename(data["item"]["name"])}_podcastCover_current.png",
+            ),
+        )
+    else:
+        print("None")
 
 
 if __name__ == "__main__":
