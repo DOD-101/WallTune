@@ -49,23 +49,34 @@ def main(save_path: str, interval: int, create_no_dirs: bool):
 
     if data.get("item", {}).get("type", None) == "track":
         print("S ", data["item"]["name"])
+
+        img_path = join(
+            save_path,
+            f"{sanitize_filename(data["item"]["name"])}_albumCover_current.png",
+        )
+
         urlretrieve(
             data["item"]["album"]["images"][0]["url"],
-            join(
-                save_path,
-                f"{sanitize_filename(data["item"]["name"])}_albumCover_current.png",
-            ),
+            img_path,
         )
+
+        print(img_path)
+
     elif data.get("item", {}).get("type", None) == "episode":
         print("P ", data["item"]["name"])
 
+        img_path = join(
+            save_path,
+            f"{sanitize_filename(data["item"]["name"])}_albumCover_current.png",
+        )
+
         urlretrieve(
             data["item"]["images"][0]["url"],
-            join(
-                save_path,
-                f"{sanitize_filename(data["item"]["name"])}_podcastCover_current.png",
-            ),
+            img_path,
         )
+
+        print(img_path)
+
     else:
         print("None")
 
